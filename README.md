@@ -1,1 +1,5 @@
 # cost-abroad
+
+A tool for visualising information about the relative day-to-day costs of visting different countries in europe.
+
+There are wide variations in the cost of food, accommdation, transport etc. between european countries, so being able to get a simple overview of this in choropleth format can help with planning trips and budgeting when travelling on holiday or business.
