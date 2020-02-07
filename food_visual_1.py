@@ -1,4 +1,3 @@
-import json
 import plotly as py
 import plotly.graph_objs as go
 from filter_cost_abroad import food_costs
@@ -24,10 +23,12 @@ data = {
 layout = {
     'height': 900,
     'width': 900,
+    'title': ' Relative Cost Compared to EU Average',
+    'font': {'size': 16},
     'margin': {"t": 50, "b": 50, "l": 50, "r": 50},
     'geo': {
-        'lataxis': {'range': [36.0, 65.0]}, 
-        'lonaxis': {"range": [-30.0, 36.0]}, 
+        'lataxis': {'range': [36.0, 71.0]}, 
+        'lonaxis': {"range": [-10.0, 35.0]}, 
         'projection': {'type': 'transverse mercator'}, 
         'resolution': 50, 
         'showcoastlines': True, 

@@ -6,7 +6,7 @@ def food_costs():
     food_cost = food["value"].values()
     country = list(food["dimension"]["geo"]["category"]["label"].values())
     country = _tidy_countries(country)
-    return [x for x in sorted(list(zip(country, food_cost)))] # if x[0] in countries
+    return sorted(list(zip(country, food_cost)))
 
 def _get_food():
     """Load food JSON."""
