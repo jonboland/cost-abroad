@@ -16,6 +16,6 @@ def _get_food():
 
 def _tidy_countries(country):
     """Return updated country list."""
-    return ['Germany' if x == 
-    'Germany (until 1990 former territory of the FRG)' 
-    else x for x in country]
+    country = ['Germany' if 'FRG' in x else x for x in country]
+    country = ['Exclude' if 'Candidate' in x else x for x in country]
+    return country
