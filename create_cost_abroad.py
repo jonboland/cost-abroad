@@ -1,24 +1,44 @@
 import json
 import requests
 
-url = "http://ec.europa.eu/eurostat/wdds/rest/data/v2.1/json/en/prc_ppp_ind"
+url = 'http://ec.europa.eu/eurostat/wdds/rest/data/v2.1/json/en/prc_ppp_ind'
 
-# Request JSON from eurostat web server.
-food = requests.get(
-    url,
-    headers={"Accept": "application/json"},
-    params={
-        "na_item": "PLI_EU28",
-        "sinceTimePeriod": "2018",
-        "groupedIndicators": "1",
-        "precision": "1",
-        "ppp_cat": "A010101",   # ["A010101", "A0102"] 
-            }
-    ).json()
+def create_price_files():
+    """Create price level data files for each category."""
+    categories = {
+        'food': 'A010101',
+        'alcohol': 'A010201',
+        'transport': 'A0107',
+        'recreation': 'A0109',
+        'restaurant_hotel': 'A0111',
+        }
+    for name, code in categories.items():
+        _price_write(f'{name}', f'{code}')
 
-# Write JSON to local file.
-with open('food_store.txt', 'w') as outfile:
-    json.dump(food, outfile)
+def _price_write(name, code):
+    """Write raw price data for a category to local file."""
+    prices = _price_raw(code)
+    with open(f'{name}.txt', 'w') as outfile:
+        json.dump(prices, outfile)
+
+def _price_raw(code):
+    """Request JSON from eurostat web server."""
+    prices = requests.get(
+        url,
+        headers = {'Accept': 'application/json'},
+        params = {
+            'na_item': 'PLI_EU28',
+            'lastTimePeriod': '1',
+            'precision': '1',
+            'ppp_cat': code,
+                }
+        ).json()
+    return prices
+
+create_price_files()
+
+
+
 
 
 

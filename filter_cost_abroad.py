@@ -10,7 +10,7 @@ def food_costs():
 
 def _get_food():
     """Load food JSON."""
-    with open('food_store.txt') as json_file:
+    with open('food.txt') as json_file:
         food = json.load(json_file)
     return food
 
