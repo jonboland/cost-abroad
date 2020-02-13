@@ -1,21 +1,17 @@
-import json
 
-def food_costs():
-    """Return required data from food JSON."""
-    food = _get_food()
-    food_cost = food["value"].values()
-    country = list(food["dimension"]["geo"]["category"]["label"].values())
+def filter_prices(prices):
+    """Filter price file to leave required data."""
+    category_cost = prices["value"].values()
+    country = list(prices["dimension"]["geo"]["category"]["label"].values())
     country = _tidy_countries(country)
-    return sorted(list(zip(country, food_cost)))
-
-def _get_food():
-    """Load food JSON."""
-    with open('food.txt') as json_file:
-        food = json.load(json_file)
-    return food
+    return sorted(list(zip(country, category_cost)))
 
 def _tidy_countries(country):
     """Return updated country list."""
     country = ['Germany' if 'FRG' in x else x for x in country]
     country = ['Exclude' if 'Candidate' in x else x for x in country]
     return country
+
+
+
+

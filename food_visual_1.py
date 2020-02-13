@@ -1,8 +1,10 @@
+import json
 import plotly as py
 import plotly.graph_objs as go
-from filter_cost_abroad import food_costs
 
-food_costs = food_costs()
+
+with open('food.txt') as json_file:
+        food_costs = json.load(json_file)
 
 x_values = [x[0] for x in food_costs]
 y_values = [x[1] for x in food_costs]
