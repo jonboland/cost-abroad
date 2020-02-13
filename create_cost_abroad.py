@@ -1,5 +1,6 @@
 import json
 import requests
+from filter_cost_abroad import filter_prices
 
 url = 'http://ec.europa.eu/eurostat/wdds/rest/data/v2.1/json/en/prc_ppp_ind'
 
@@ -11,13 +12,14 @@ def create_price_files():
         'transport': 'A0107',
         'recreation': 'A0109',
         'restaurant_hotel': 'A0111',
-        }
+    }
     for name, code in categories.items():
         _price_write(f'{name}', f'{code}')
 
 def _price_write(name, code):
     """Write raw price data for a category to local file."""
     prices = _price_raw(code)
+    prices = filter_prices(prices)
     with open(f'{name}.txt', 'w') as outfile:
         json.dump(prices, outfile)
 
@@ -25,21 +27,14 @@ def _price_raw(code):
     """Request JSON from eurostat web server."""
     prices = requests.get(
         url,
-        headers = {'Accept': 'application/json'},
-        params = {
+        headers={'Accept': 'application/json'},
+        params={
             'na_item': 'PLI_EU28',
             'lastTimePeriod': '1',
             'precision': '1',
             'ppp_cat': code,
-                }
-        ).json()
+        },
+    ).json()
     return prices
 
 create_price_files()
-
-
-
-
-
-
-
