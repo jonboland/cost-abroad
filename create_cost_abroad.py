@@ -14,16 +14,16 @@ def create_price_files():
         'restaurant_hotel': 'A0111',
     }
     for name, code in categories.items():
-        _price_write(f'{name}', f'{code}')
+        price_write(f'{name}', f'{code}')
 
-def _price_write(name, code):
+def price_write(name, code):
     """Write raw price data for a category to local file."""
-    prices = _price_raw(code)
+    prices = price_raw(code)
     prices = filter_prices(prices)
     with open(f'{name}.txt', 'w') as outfile:
         json.dump(prices, outfile)
 
-def _price_raw(code):
+def price_raw(code):
     """Request JSON from eurostat web server."""
     prices = requests.get(
         url,
