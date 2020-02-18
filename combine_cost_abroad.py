@@ -17,5 +17,3 @@ def combined_values():
             prices = json.load(json_file)
         cat_prices[category] = prices
     return cat_prices
-
-print(combined_values())
