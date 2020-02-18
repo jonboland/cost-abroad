@@ -6,6 +6,7 @@ def filter_prices(prices):
     country = _tidy_countries(country)
     return sorted(list(zip(country, category_cost)))
 
+
 def _tidy_countries(country):
     """Return updated country list."""
     country = ['Germany' if 'FRG' in x else x for x in country]
