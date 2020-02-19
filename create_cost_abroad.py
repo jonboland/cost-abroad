@@ -2,7 +2,9 @@ import json
 import requests
 from filter_cost_abroad import filter_prices
 
+
 url = 'http://ec.europa.eu/eurostat/wdds/rest/data/v2.1/json/en/prc_ppp_ind'
+
 
 def create_price_files():
     """Create price level data files for each category."""
@@ -16,12 +18,14 @@ def create_price_files():
     for name, code in categories.items():
         price_write(f'{name}', f'{code}')
 
+
 def price_write(name, code):
     """Write raw price data for a category to local file."""
     prices = price_raw(code)
     prices = filter_prices(prices)
     with open(f'{name}.txt', 'w') as outfile:
         json.dump(prices, outfile)
+
 
 def price_raw(code):
     """Request JSON from eurostat web server."""
