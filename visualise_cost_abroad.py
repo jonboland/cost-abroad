@@ -5,7 +5,9 @@ from combine_cost_abroad import combined_values
 
 price_levels = combined_values()
 
-categories = (('food', 'reds'),
+categories = (
+              ('overall', 'reds'),
+              ('food', 'magenta'),
               ('alcohol', 'greens'),
               ('transport', 'blues'),
               ('recreation', 'purples'),
