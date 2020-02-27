@@ -13,6 +13,10 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 # Import dictionary containing cost categories
 price_levels = combined_values()
 
+color = {'overall': 'reds', 'food': 'magenta',
+         'alcohol': 'greens', 'transport': 'blues',
+         'recreation': 'purples', 'restaurant_hotel': 'teal'}
+
 
 ############################### PAGE COMPONENTS ##############################
 
@@ -34,6 +38,11 @@ app.layout = html.Div([
             value='overall',
             options=[
                 {'label': 'Overall ', 'value': 'overall'},
+                {'label': 'Food', 'value': 'food'},
+                {'label': 'Alcohol', 'value': 'alcohol'},
+                {'label': 'Transport', 'value': 'transport'},
+                {'label': 'Recreation', 'value': 'recreation'},
+                {'label': 'Restaurants & Hotels', 'value': 'restaurant_hotel'}
             ],
             style={'display': 'block', 'margin-left': 'auto',
                    'margin-right': 'auto', 'width': '70%'},
@@ -62,7 +71,7 @@ def update_figure(selected):
         type='choropleth',
         locations=x_values,
         locationmode='country names',
-        colorscale='reds',
+        colorscale=color[selected],
         colorbar=go.choropleth.ColorBar(
                     ticksuffix='%',
                     title='',
