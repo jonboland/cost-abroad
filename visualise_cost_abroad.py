@@ -24,35 +24,31 @@ app.layout = html.Div([
 
     html.Div([
         html.H1('Cost Abroad')
-    ], style={'textAlign': 'center', 'padding-bottom': 30}),
+    ], style={'textAlign': 'center', 'padding-bottom': 0}),
 
     html.Div([
-        html.Span(
-            'Category : ',
-            className='six columns',
-            style={'text-align': 'right',
-                   'width': '40%', 'padding-top': 5}
-        ),
-        dcc.Dropdown(
+        html.H6(dcc.RadioItems(
             id='value-selected',
             value='overall',
             options=[
-                {'label': 'Overall ', 'value': 'overall'},
+                {'label': 'Overall', 'value': 'overall'},
                 {'label': 'Food', 'value': 'food'},
                 {'label': 'Alcohol', 'value': 'alcohol'},
                 {'label': 'Transport', 'value': 'transport'},
                 {'label': 'Recreation', 'value': 'recreation'},
                 {'label': 'Restaurants & Hotels', 'value': 'restaurant_hotel'}
             ],
-            style={'display': 'block', 'margin-left': 'auto',
-                   'margin-right': 'auto', 'width': '70%'},
+            labelStyle={'display': 'inline-block'},
+            style={'display': 'block', 'margin-left': 130,
+                   'margin-right': 'auto', 'width': '70%',},
             className='six columns',
-        )
-    ], className='row'),
+        )  
+    )], className='row'),
 
     dcc.Graph(id='my-graph')
 
 ], className='container')
+
 
 
 ############################# CALLBACK/FIGURE ################################
@@ -74,7 +70,7 @@ def update_figure(selected):
         colorscale=color[selected],
         colorbar=go.choropleth.ColorBar(
                     ticksuffix='%',
-                    title='',
+                    title='EU28',
                     len=0.5),
         z=y_values,
     )
@@ -84,7 +80,7 @@ def update_figure(selected):
                     height=900,
                     width=900,
                     font={'size': 16},
-                    margin={'t': 50, 'b': 50, 'l': 50, 'r': 50},
+                    margin={'t': 0, 'b': 185, 'l': 150, 'r': 50},
                     geo={'lataxis': {'range': [36.0, 71.0]},
                          'lonaxis': {'range': [-10.0, 35.0]},
                          'projection': {'type': 'transverse mercator'},
