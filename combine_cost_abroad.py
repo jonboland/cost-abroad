@@ -7,14 +7,21 @@ categories = ('food', 'alcohol', 'transport',
 
 
 def combined_values():
-    """Combine category values into single dict with overall cat."""
+    """Combine category values into a single file with overall category."""
     cat_prices = {}
     for category in categories:
         with open(f'{category}.txt') as json_file:
             prices = json.load(json_file)
         cat_prices[category] = prices
+    print(cat_prices)
     cat_prices['overall'] = _add_overall(cat_prices)
-    return cat_prices
+    _combined_write(cat_prices)
+
+
+def _combined_write(cat_prices):
+    """Write combined values data to local file."""
+    with open('combined.txt', 'w') as outfile:
+        json.dump(cat_prices, outfile)
 
 
 def _add_overall(cat_prices):
@@ -31,3 +38,9 @@ def _add_overall(cat_prices):
     for combined_stats in overall:
         combined_stats[1] = round(mean(combined_stats[1]), 1)
     return overall
+
+
+combined_values()
+
+
+
