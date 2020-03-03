@@ -1,9 +1,8 @@
+import json
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
-
-from combine_cost_abroad import combined_values
 
 
 external_stylesheets = ['https://codepen.io/jonboland/pen/yLyxpZa.css']
@@ -11,9 +10,11 @@ external_stylesheets = ['https://codepen.io/jonboland/pen/yLyxpZa.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 
-# Import dictionary containing cost category data
-price_levels = combined_values()
+# Load all cost category data
+with open('combined.txt') as json_file:
+        price_levels = json.load(json_file)
 
+# Specify category colors
 color = {'overall': 'reds', 'food': 'magenta',
          'alcohol': 'greens', 'transport': 'blues',
          'recreation': 'purples', 'restaurant_hotel': 'teal'}
@@ -59,7 +60,6 @@ app.layout = html.Div([
 ], className='container')
 
 
-
 ############################# CALLBACK/FIGURE ################################
 
 @app.callback(
@@ -82,7 +82,6 @@ def update_figure(selected):
                     title='Percent',
                     len=0.5),
         z=y_values,
-        # text='%',
     )
 
     return {'data': [trace],
