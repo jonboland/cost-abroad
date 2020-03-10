@@ -3,24 +3,23 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
+from create_cost_abroad import categories
 
 
 external_stylesheets = ['https://codepen.io/jonboland/pen/yLyxpZa.css']
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
-
 # Load all cost category data
 with open('combined.txt') as json_file:
         price_levels = json.load(json_file)
 
-# Specify category colors
-color = {'overall': 'reds', 'food': 'magenta',
-         'alcohol': 'greens', 'transport': 'blues',
-         'recreation': 'purples', 'restaurant_hotel': 'teal'}
+# Add overall to selected categories
+# (Categories are selected when price files are originally created)
+complete = {**{'overall': 'reds'}, **{k:v[1] for k,v in categories.items()}}
 
 
-############################### PAGE COMPONENTS ##############################
+################################ PAGE COMPONENTS ###############################
 
 app.layout = html.Div([
 
@@ -40,14 +39,8 @@ app.layout = html.Div([
         html.H6(dcc.RadioItems(
             id='value-selected',
             value='overall',
-            options=[
-                {'label': 'Overall', 'value': 'overall'},
-                {'label': 'Food', 'value': 'food'},
-                {'label': 'Alcohol', 'value': 'alcohol'},
-                {'label': 'Transport', 'value': 'transport'},
-                {'label': 'Recreation', 'value': 'recreation'},
-                {'label': 'Restaurants & Hotels', 'value': 'restaurant_hotel'}
-            ],
+            options=[{'label': 'Restaurants & Hotels' if x == 'restaurant_hotel' 
+                      else x.title(), 'value': x} for x in complete],
             labelStyle={'display': 'inline-block'},
             style={'display': 'block', 'margin-left': 140,
                    'margin-right': 'auto', 'width': '70%'},
@@ -60,7 +53,7 @@ app.layout = html.Div([
 ], className='container')
 
 
-############################# CALLBACK/FIGURE ################################
+############################## CALLBACK/FIGURE #################################
 
 @app.callback(
     dash.dependencies.Output('my-graph', 'figure'),
@@ -76,7 +69,7 @@ def update_figure(selected):
         type='choropleth',
         locations=x_values,
         locationmode='country names',
-        colorscale=color[selected],
+        colorscale=complete[selected],
         colorbar=go.choropleth.ColorBar(
                     ticksuffix='',
                     title='Percent',
