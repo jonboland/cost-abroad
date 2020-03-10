@@ -6,10 +6,10 @@ from filter_cost_abroad import filter_prices
 url = 'http://ec.europa.eu/eurostat/wdds/rest/data/v2.1/json/en/prc_ppp_ind'
 
 
-def create_price_files(**kwargs):
+def create_price_files():
     """Create price level data files for each category."""
-    for name, code in kwargs.items():
-        price_write(name, code)
+    for name, code in categories.items():
+        price_write(name, code[0])
 
 
 def price_write(name, code):
@@ -35,12 +35,15 @@ def price_raw(code):
     return prices
 
 
+# Specify categories to include:
+# (The overall category is automatically added prior to visualisation)
 categories = {
-    'food': 'A010101',
-    'alcohol': 'A010201',
-    'transport': 'A0107',
-    'recreation': 'A0109',
-    'restaurant_hotel': 'A0111',
+      'food': ['A010101', 'magenta'],
+      'alcohol': ['A010201', 'greens'], 
+      'transport': ['A0107', 'blues'],
+      'recreation': ['A0109', 'purples'], 
+      'restaurant_hotel': ['A0111', 'teal'],
 }
 
-create_price_files(**categories)
+if __name__ == '__main__':
+    create_price_files()
