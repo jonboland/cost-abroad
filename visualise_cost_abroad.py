@@ -1,3 +1,4 @@
+
 import json
 import dash
 import dash_core_components as dcc
@@ -14,12 +15,13 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 with open('combined.txt') as json_file:
         price_levels = json.load(json_file)
 
-# Add overall to selected categories
-# (Categories are selected when price files are originally created)
-complete = {**{'overall': 'reds'}, **{k:v[1] for k,v in categories.items()}}
+# Add overall to specified categories
+# (Categories are specified when price files are originally created)
+complete = {**{'overall': 'reds'},
+            **{name: value[1] for name, value in categories.items()}}
 
 
-################################ PAGE COMPONENTS ###############################
+############################### PAGE COMPONENTS ################################
 
 app.layout = html.Div([
 
@@ -28,24 +30,24 @@ app.layout = html.Div([
     ], style={'textAlign': 'center', 'padding-bottom': 0}),
 
     html.Div('Select a category and hover over countries '
-        'to see how their prices compare to the EU average.', 
+        'to see how their prices compare to the EU average.',
         style={'textAlign': 'center'}),
 
     html.Div('The average price across all EU member states '
-        'is equivalent to 100.', 
+        'is equivalent to 100.',
         style={'textAlign': 'center'}),
 
     html.Div([
         html.H6(dcc.RadioItems(
             id='value-selected',
             value='overall',
-            options=[{'label': 'Restaurants & Hotels' if x == 'restaurant_hotel' 
+            options=[{'label': 'Restaurants & Hotels' if x == 'restaurant_hotel'
                       else x.title(), 'value': x} for x in complete],
             labelStyle={'display': 'inline-block'},
             style={'display': 'block', 'margin-left': 140,
                    'margin-right': 'auto', 'width': '70%'},
             className='six columns',
-        )  
+        )
     )], className='row'),
 
     dcc.Graph(id='my-graph')
