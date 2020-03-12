@@ -1,4 +1,3 @@
-
 import json
 import dash
 import dash_core_components as dcc
@@ -18,7 +17,7 @@ with open('combined.txt') as json_file:
 # Add overall to specified categories
 # (Categories are specified when price files are originally created)
 complete = {**{'overall': 'reds'},
-            **{name: value[1] for name, value in categories.items()}}
+            **{name:value[1] for name,value in categories.items()}}
 
 
 ############################### PAGE COMPONENTS ################################
