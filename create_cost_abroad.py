@@ -35,7 +35,7 @@ def price_raw(code):
     return prices
 
 
-# Specified categories to include:
+# Specified categories:
 # (The overall category is automatically added prior to visualisation)
 categories = {
     'food': ['A010101', 'magenta'],
