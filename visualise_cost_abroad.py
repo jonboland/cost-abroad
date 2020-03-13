@@ -3,7 +3,6 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
-from create_cost_abroad import categories
 
 
 external_stylesheets = ['https://codepen.io/jonboland/pen/yLyxpZa.css']
@@ -14,10 +13,9 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 with open('combined.txt') as json_file:
         price_levels = json.load(json_file)
 
-# Add overall to specified categories
-# (Categories are specified when price files are originally created)
-complete = {**{'overall': 'reds'},
-            **{name:value[1] for name,value in categories.items()}}
+colours = ('reds', 'magenta', 'greens', 'blues', 'purples', 'teal')
+categories = reversed(tuple(price_levels.keys()))
+complete = dict(zip(categories, colours))
 
 
 ############################### PAGE COMPONENTS ################################

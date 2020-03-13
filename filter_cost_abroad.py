@@ -1,3 +1,8 @@
+"""
+Take raw JSON received from eurostat server for a cost category
+and return filtered price data with tidied country names.
+"""
+
 
 def filter_prices(prices):
     """Filter price file to leave required data."""
