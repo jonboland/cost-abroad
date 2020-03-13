@@ -1,13 +1,30 @@
+"""
+Combine JSON cost category data from local files into a single JSON
+file and add an overall category.
+
+One or more of the below keyword arguments must be passed
+to the create_combined_file function:
+
+food=['A010101', 'magenta'],
+alcohol=['A010201', 'greens'],
+transport=['A0107', 'blues'],
+recreation=['A0109', 'purples'],
+restaurant_hotel=['A0111', 'teal']
+
+An individual file for each passed category must be present
+or a FileNotFoundError will be generated.
+"""
+
+
 import json
 from statistics import mean
 from collections import defaultdict
-from create_cost_abroad import categories
 
 
-def combined_values():
+def create_combined_file(**kwargs):
     """Combine category values into a single file with overall category."""
     cat_prices = {}
-    for category in categories:
+    for category in kwargs:
         with open(f'{category}.txt') as json_file:
             prices = json.load(json_file)
         cat_prices[category] = prices
@@ -29,7 +46,3 @@ def _add_overall(cat_prices):
             grouped[country].append(price)
     average = {k:round(mean(v), 1) for k,v in grouped.items()}
     return list(average.items())
-
-
-if __name__ == '__main__':
-    combined_values()
