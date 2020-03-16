@@ -5,11 +5,11 @@ and write filtered price data to a local JSON file for each.
 One or more of the below keyword arguments must be passed
 to the create_price_files function:
 
-food=['A010101', 'magenta'],
-alcohol=['A010201', 'greens'],
-transport=['A0107', 'blues'],
-recreation=['A0109', 'purples'],
-restaurant_hotel=['A0111', 'teal']
+food='A010101'
+alcohol='A010201'
+transport='A0107'
+recreation='A0109'
+restaurant_hotel='A0111'
 """
 
 
@@ -24,7 +24,7 @@ URL = 'http://ec.europa.eu/eurostat/wdds/rest/data/v2.1/json/en/prc_ppp_ind'
 def create_price_files(**kwargs):
     """Create price level data files for each category."""
     for name, value in kwargs.items():
-        price_write(name, value[0])
+        price_write(name, value)
 
 
 def price_write(name, code):
