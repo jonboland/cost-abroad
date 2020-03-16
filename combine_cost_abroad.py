@@ -5,11 +5,11 @@ file and add an overall category.
 One or more of the below keyword arguments must be passed
 to the create_combined_file function:
 
-food=['A010101', 'magenta'],
-alcohol=['A010201', 'greens'],
-transport=['A0107', 'blues'],
-recreation=['A0109', 'purples'],
-restaurant_hotel=['A0111', 'teal']
+food='A010101'
+alcohol='A010201'
+transport='A0107'
+recreation='A0109'
+restaurant_hotel='A0111'
 
 An individual file for each passed category must be present
 or a FileNotFoundError will be generated.
