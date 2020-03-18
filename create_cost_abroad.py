@@ -16,7 +16,6 @@ restaurant_hotel='A0111'
 import json
 import requests
 from filter_cost_abroad import filter_prices
-from pprint import pprint
 
 
 URL = 'http://ec.europa.eu/eurostat/wdds/rest/data/v2.1/json/en/prc_ppp_ind'
