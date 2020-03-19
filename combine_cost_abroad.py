@@ -29,10 +29,11 @@ def create_combined_file(**kwargs):
             prices = json.load(json_file)
         cat_prices[category] = prices
     cat_prices['overall'] = _add_overall(cat_prices)
-    _combined_write(cat_prices)
+    combined_write(cat_prices)
+    return cat_prices
 
 
-def _combined_write(cat_prices):
+def combined_write(cat_prices):
     """Write combined values data to local file."""
     with open('combined.txt', 'w') as outfile:
         json.dump(cat_prices, outfile)
