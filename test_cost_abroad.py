@@ -4,6 +4,7 @@ import create_cost_abroad
 from io import StringIO
 import responses
 from filter_cost_abroad import filter_prices
+import combine_cost_abroad
 
 
 
@@ -136,6 +137,92 @@ class FilterTests(unittest.TestCase):
         self.assertEqual(tdy_can, [('Albania', 77.8),
                                    ('Bosnia and Herzegovina', 75.3),
                                    ('Exclude', 74.4)])
+
+
+class CombineTests(unittest.TestCase):
+    """Tests for the combine_cost_abroad module."""
+
+    @patch('json.load', spec=True)
+    @patch('builtins.open', spec=True)
+    def test_create_combined_file_one_cat(self, mock_op, mock_json_load):
+        """Test one price categories combined with overall."""
+        mock_json_load.side_effect = ([['Albania', 77.8],
+                                       ['Bosnia and Herzegovina', 75.3]],
+                                      )
+        result = combine_cost_abroad.create_combined_file(food='A010101')
+        self.assertEqual(result, {"food": [["Albania", 77.8],
+                                           ["Bosnia and Herzegovina", 75.3]],
+                                  "overall": [("Albania", 77.8),
+                                              ("Bosnia and Herzegovina", 75.3)],
+                                  }
+                         )
+
+
+    @patch('json.load', spec=True)
+    @patch('builtins.open', spec=True)
+    def test_create_combined_file_two_cats(self, mock_op, mock_json_load):
+        """Test two price categories combined with overall."""
+        mock_json_load.side_effect = ([['Albania', 77.8],
+                                       ['Bosnia and Herzegovina', 75.3]],
+                                      [['Albania', 64.4],
+                                       ['Bosnia and Herzegovina', 69.1]],
+                                      )
+        result = combine_cost_abroad.create_combined_file(food='A010101',
+                                                          alcohol='A010201')
+        self.assertEqual(result, {"food": [["Albania", 77.8],
+                                           ["Bosnia and Herzegovina", 75.3]],
+                                  "alcohol": [["Albania", 64.4],
+                                              ["Bosnia and Herzegovina", 69.1]],
+                                  "overall": [("Albania", 71.1),
+                                              ("Bosnia and Herzegovina", 72.2)],
+                                  }
+                         )
+
+
+    @patch('json.load', spec=True)
+    @patch('builtins.open', spec=True)
+    def test_create_combined_file_all_cats(self, mock_op, mock_json_load):
+        """Test all price categories combined with overall."""
+        mock_json_load.side_effect = ([['Albania', 77.8],
+                                       ['Bosnia and Herzegovina', 75.3]],
+                                      [['Albania', 64.4],
+                                       ['Bosnia and Herzegovina', 69.1]],
+                                      [["Albania", 50.2],
+                                       ["Bosnia and Herzegovina", 60.4]],
+                                      [["Albania", 80.9],
+                                       ["Bosnia and Herzegovina", 49.3]],
+                                      [["Albania", 62.1],
+                                       ["Bosnia and Herzegovina", 63.1]],
+                                      )
+        result = combine_cost_abroad.create_combined_file(food='A010101',
+                                                          alcohol='A010201',
+                                                          transport='A0107',
+                                                          recreation='A0109',
+                                                          restaurant_hotel='A0111')
+        self.assertEqual(result, {"food": [["Albania", 77.8],
+                                           ["Bosnia and Herzegovina", 75.3]],
+                                  "alcohol": [["Albania", 64.4],
+                                              ["Bosnia and Herzegovina", 69.1]],
+                                  "transport": [["Albania", 50.2],
+                                                ["Bosnia and Herzegovina", 60.4]],
+                                  "recreation": [["Albania", 80.9],
+                                                 ["Bosnia and Herzegovina", 49.3]],
+                                  "restaurant_hotel": [["Albania", 62.1],
+                                                       ["Bosnia and Herzegovina", 63.1]],
+                                  "overall": [("Albania", 67.1),
+                                              ("Bosnia and Herzegovina", 63.4)],
+                                  }
+                         )
+
+
+    @patch('builtins.open',spec=True)
+    def test_combined_write_called_correctly(self, mock_op, spec=True):
+        """Combined write called with correct file name."""
+        combine_cost_abroad.combined_write({"food": [["Albania", 77.8],
+                                           ["Bosnia and Herzegovina", 75.3]],
+                                           "overall": [("Albania", 77.8),
+                                           ("Bosnia and Herzegovina", 75.3)]})
+        open.assert_called_with('combined.txt', 'w')
 
 
 
