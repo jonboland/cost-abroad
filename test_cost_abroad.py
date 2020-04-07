@@ -5,6 +5,7 @@ from io import StringIO
 import responses
 from filter_cost_abroad import filter_prices
 import combine_cost_abroad
+import run_files
 
 
 
@@ -224,6 +225,24 @@ class CombineTests(unittest.TestCase):
                                            ("Bosnia and Herzegovina", 75.3)]})
         open.assert_called_with('combined.txt', 'w')
 
+
+class RunFilesTest(unittest.TestCase):
+    """Test for the run_files module."""
+    @patch('run_files.create_price_files', spec=True)
+    @patch('run_files.create_combined_file', spec=True)
+    def test_create_and_combined_called_correctly(self, mock_cf, mock_pf):
+        """Test category file and combined file functions called correctly."""
+        run_files.run_files(**run_files.categories)
+        run_files.create_price_files.assert_called_with(food='A010101',
+                                                        alcohol='A010201',
+                                                        transport='A0107',
+                                                        recreation='A0109',
+                                                        restaurant_hotel='A0111')
+        run_files.create_combined_file.assert_called_with(food='A010101',
+                                                          alcohol='A010201',
+                                                          transport='A0107',
+                                                          recreation='A0109',
+                                                          restaurant_hotel='A0111')
 
 
 if __name__ == '__main__':
