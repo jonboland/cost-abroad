@@ -6,6 +6,8 @@ import responses
 from filter_cost_abroad import filter_prices
 import combine_cost_abroad
 import run_files
+import visualise_cost_abroad
+from snapshot_test import DashSnapshotTestCase
 
 
 
@@ -243,6 +245,31 @@ class RunFilesTest(unittest.TestCase):
                                                           transport='A0107',
                                                           recreation='A0109',
                                                           restaurant_hotel='A0111')
+
+
+
+class VisualiseTest(DashSnapshotTestCase):
+    """Test for the visualise_cost_abroad module."""
+
+    def test_html_snapshot_matches_reference(self):
+        """Test Dash app html snapshot matches reference snapshot."""
+        my_component = visualise_cost_abroad.app.layout
+        # Increment id to recreate snapshot when running test
+        self.assertSnapshotEqual(my_component, 'id-004')
+
+
+    def test_choropleth_contains_country_list_excerpt(self):
+        """Test update_figure passing country list entries to choropleth."""
+        # Excerpt includes entries dependent on filter's tidy function
+        excerpt = ('"Exclude", "Finland", "France", "Germany", '
+                   '"Greece", "Hungary", "Iceland", "Ireland", "Italy", '
+                   '"Latvia", "Lithuania", "Luxembourg", "Malta", '
+                   '"Montenegro", "Netherlands", "North Macedonia", '
+                   '"Norway", "Poland", "Portugal", "Romania", "Serbia", '
+                   '"Slovakia", "Slovenia", "Spain", "Sweden", '
+                   '"Switzerland", "Turkey", "United Kingdom"')
+        result = visualise_cost_abroad.update_figure('overall')
+        self.assertIn(excerpt, result)
 
 
 if __name__ == '__main__':
