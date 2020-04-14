@@ -24,7 +24,7 @@ app.layout = html.Div([
 
     html.Div([
         html.H1('Cost Abroad')
-    ], style={'textAlign': 'center', 'padding-bottom': 0}),
+    ], style={'textAlign': 'center'}),
 
     html.Div('Select a category and hover over countries '
         'to see how their prices compare to the EU average.',
@@ -41,13 +41,14 @@ app.layout = html.Div([
             options=[{'label': 'Restaurants & Hotels' if x == 'restaurant_hotel'
                       else x.title(), 'value': x} for x in complete],
             labelStyle={'display': 'inline-block'},
-            style={'display': 'block', 'margin-left': 140,
-                   'margin-right': 'auto', 'width': '70%'},
+            style={'textAlign': 'center', 'width': 'auto'},
             className='six columns',
         )
-    )], className='row'),
+    )], className='row', style={'display': 'flex', 'justifyContent': 'center'}),
 
-    dcc.Graph(id='my-graph')
+    dcc.Graph(id='my-graph',
+              style={'width': 700, 'margin-left': 'auto', 'margin-right': 'auto'}
+    )
 
 ], className='container')
 
@@ -78,10 +79,10 @@ def update_figure(selected):
 
     return {'data': [trace],
             'layout': go.Layout(
-                    height=900,
-                    width=900,
+                    height=700,
+                    width=700,
                     font={'size': 16},
-                    margin={'t': 0, 'b': 185, 'l': 150, 'r': 50},
+                    margin={'t': 0, 'b': 0, 'l': 0, 'r': 0},
                     geo={'lataxis': {'range': [36.0, 71.0]},
                          'lonaxis': {'range': [-10.0, 35.0]},
                          'projection': {'type': 'transverse mercator'},
