@@ -1,13 +1,14 @@
 import unittest
 from unittest.mock import patch, call
-import create_cost_abroad
 from io import StringIO
 import responses
-from filter_cost_abroad import filter_prices
-import combine_cost_abroad
+from snapshot_test import DashSnapshotTestCase
+
+import create_cost_abroad
+import filter_cost_abroad
+import combine_cost_abroad as cca
 import run_files
 import visualise_cost_abroad
-from snapshot_test import DashSnapshotTestCase
 
 
 
@@ -19,44 +20,43 @@ class CreateTests(unittest.TestCase):
     """Tests for the create_cost_abroad module."""
 
     @patch('create_cost_abroad.create_price_file', spec=True)
-    def test_create_price_files(self, mock_create_price_file):
+    def test_create_price_files(self, mock_cpf):
         """Call create price file with two differnt categories."""
         create_cost_abroad.create_price_files(alcohol='A010201',
                                               transport='A0107')
-        self.assertEqual(mock_create_price_file.mock_calls,
+        self.assertEqual(mock_cpf.mock_calls,
                          [call('alcohol', 'A010201'),
                           call('transport', 'A0107')])
 
-
+    # fmt: on
     @patch('create_cost_abroad.write_prices', spec=True)
     @patch('create_cost_abroad.prices_raw', spec=True,
            return_value={"value": {"0": 77.8}, "dimension": {"geo": {"category":
                         {"index": {"AL": 0}, "label": {"AL": "Albania"}}}}})
-    def test_create_price_file(self, mock_prices_raw, mock_write_prices):
+    def test_create_price_file(self, mock_pr, mock_wp):
         """Create price file returns list containing a tuple."""
         result = create_cost_abroad.create_price_file('food', 'A010101')
         self.assertEqual(result, [('Albania', 77.8)])
+    # fmt: on
 
 
     @patch('builtins.open')
     def test_write_prices_called_correctly(self, mock_op):
         """Write prices files called with correct category file name."""
-        create_cost_abroad.write_prices('food', [('Albania', 77.8)])
-        open.assert_called_with('food.txt', 'w')
+        create_cost_abroad.write_prices('recreation', [('Germany', 103.2)])
+        open.assert_called_with('recreation.txt', 'w')
 
 
     @patch('create_cost_abroad.requests.get', spec=True)
-    def test_get_is_called_correctly(self, get_json):
+    def test_get_is_called_correctly(self, get_js):
         """Get is called with correct URL and parameters."""
-        create_cost_abroad.prices_raw('A010101')
-        get_json.assert_called_with(URL,
-                                    headers={'Accept': 'application/json'},
-                                    params={'na_item': 'PLI_EU28',
-                                            'lastTimePeriod': '1',
-                                            'precision': '1',
-                                            'ppp_cat': 'A010101',
-                                            }
-                                    )
+        create_cost_abroad.prices_raw('A0109')
+        get_js.assert_called_with(URL,
+                                  headers={'Accept': 'application/json'},
+                                  params={'na_item': 'PLI_EU28',
+                                          'lastTimePeriod': '1',
+                                          'precision': '1',
+                                          'ppp_cat': 'A0109'})
 
 
     @patch('create_cost_abroad.requests.get')
@@ -64,7 +64,7 @@ class CreateTests(unittest.TestCase):
         """Default error text suppressed if connection error encountered."""
         mock_get.side_effect = (create_cost_abroad.requests.
                                 exceptions.ConnectionError())
-        self.assertIsNone(create_cost_abroad.prices_raw('A010101'))
+        self.assertIsNone(create_cost_abroad.prices_raw('A0111'))
 
 
     @responses.activate
@@ -90,7 +90,7 @@ class CreateTests(unittest.TestCase):
     def test_json_returned_if_valid_code_provided(self):
         """JSON is returned if valid price category given as argument."""
         responses.add(responses.GET, URL, body=r'{"value": {"0": 77}}')
-        result = create_cost_abroad.prices_raw('A010101')
+        result = create_cost_abroad.prices_raw('A010201')
         self.assertEqual(result, {"value": {"0": 77}})
 
 
@@ -108,9 +108,9 @@ class FilterTests(unittest.TestCase):
                 "AL": "Albania", "AT": "Austria",
                 "BA": "Bosnia and Herzegovina",}}}}}
 
-        filtered = filter_prices(snip)
-        self.assertEqual(filtered, [('Albania', 77.8), ('Austria', 126.6),
-                                    ('Bosnia and Herzegovina', 75.3)])
+        filtered = filter_cost_abroad.filter_prices(snip)
+        self.assertEqual(filtered, [("Albania", 77.8), ("Austria", 126.6),
+                                    ("Bosnia and Herzegovina", 75.3)])
 
 
     def test_filter_tidy_frg(self):
@@ -121,9 +121,9 @@ class FilterTests(unittest.TestCase):
                 "AL": "Albania", "AT": "Austria",
                 "DE": "Germany (until 1990 former territory of the FRG)"}}}}}
 
-        tdy_frg = filter_prices(snip)
-        self.assertEqual(tdy_frg, [('Albania', 77.8), ('Austria', 126.6),
-                                   ('Germany', 102.4)])
+        tdy_frg = filter_cost_abroad.filter_prices(snip)
+        self.assertEqual(tdy_frg, [("Albania", 77.8), ("Austria", 126.6),
+                                   ("Germany", 102.4)])
 
 
     def test_filter_tidy_candidate(self):
@@ -136,116 +136,95 @@ class FilterTests(unittest.TestCase):
                 "except Turkey and Kosovo (under United Nations "
                 "Security Council Resolution 1244/99)"}}}}}
 
-        tdy_can = filter_prices(snip)
-        self.assertEqual(tdy_can, [('Albania', 77.8),
-                                   ('Bosnia and Herzegovina', 75.3),
-                                   ('Exclude', 74.4)])
+        tdy_can = filter_cost_abroad.filter_prices(snip)
+        self.assertEqual(tdy_can, [("Albania", 77.8),
+                                   ("Bosnia and Herzegovina", 75.3),
+                                   ("Exclude", 74.4)])
 
 
 class CombineTests(unittest.TestCase):
     """Tests for the combine_cost_abroad module."""
 
+    def setUp(self):
+        self.cdata = [[["Malta", 77.8], ["Poland", 75.3]],
+                      [["Malta", 64.4], ["Poland", 69.1]],
+                      [["Malta", 50.2], ["Poland", 60.4]],
+                      [["Malta", 80.9], ["Poland", 49.3]],
+                      [["Malta", 62.1], ["Poland", 63.1]]]
+
+        self.combi = {"food":             [["Malta", 77.8], ["Poland", 75.3]],
+                      "alcohol":          [["Malta", 64.4], ["Poland", 69.1]],
+                      "transport":        [["Malta", 50.2], ["Poland", 60.4]],
+                      "recreation":       [["Malta", 80.9], ["Poland", 49.3]],
+                      "restaurant_hotel": [["Malta", 62.1], ["Poland", 63.1]],
+                      "overall":          [("Malta", 67.1), ("Poland", 63.4)]}
+
+
     @patch('json.load', spec=True)
     @patch('builtins.open', spec=True)
-    def test_create_combined_file_one_cat(self, mock_op, mock_json_load):
+    def test_create_combined_file_one_cat(self, mock_op, mock_js):
         """Test one price categories combined with overall."""
-        mock_json_load.side_effect = ([['Albania', 77.8],
-                                       ['Bosnia and Herzegovina', 75.3]],
-                                      )
-        result = combine_cost_abroad.create_combined_file(food='A010101')
-        self.assertEqual(result, {"food": [["Albania", 77.8],
-                                           ["Bosnia and Herzegovina", 75.3]],
-                                  "overall": [("Albania", 77.8),
-                                              ("Bosnia and Herzegovina", 75.3)],
-                                  }
-                         )
-
+        mock_js.side_effect = [self.cdata[0]]
+        result = cca.create_combined_file(food='A010101')
+        self.assertEqual(result, {"food": [["Malta", 77.8], ["Poland", 75.3]],
+                                  "overall": [("Malta", 77.8),
+                                              ("Poland", 75.3)]})
 
     @patch('json.load', spec=True)
     @patch('builtins.open', spec=True)
-    def test_create_combined_file_two_cats(self, mock_op, mock_json_load):
+    def test_create_combined_file_two_cats(self, mock_op, mock_js):
         """Test two price categories combined with overall."""
-        mock_json_load.side_effect = ([['Albania', 77.8],
-                                       ['Bosnia and Herzegovina', 75.3]],
-                                      [['Albania', 64.4],
-                                       ['Bosnia and Herzegovina', 69.1]],
-                                      )
-        result = combine_cost_abroad.create_combined_file(food='A010101',
-                                                          alcohol='A010201')
-        self.assertEqual(result, {"food": [["Albania", 77.8],
-                                           ["Bosnia and Herzegovina", 75.3]],
-                                  "alcohol": [["Albania", 64.4],
-                                              ["Bosnia and Herzegovina", 69.1]],
-                                  "overall": [("Albania", 71.1),
-                                              ("Bosnia and Herzegovina", 72.2)],
-                                  }
-                         )
-
+        mock_js.side_effect = self.cdata[0:2]
+        result = cca.create_combined_file(food='A010101',
+                                          alcohol='A010201')
+        self.assertEqual(result, {**{k:v for k,v in self.combi.items()
+                                     if k in ('food', 'alcohol')},
+                                  **{"overall": [("Malta", 71.1),
+                                                 ("Poland", 72.2)]}})
 
     @patch('json.load', spec=True)
     @patch('builtins.open', spec=True)
-    def test_create_combined_file_all_cats(self, mock_op, mock_json_load):
+    def test_create_combined_file_all_cats(self, mock_op, mock_js):
         """Test all price categories combined with overall."""
-        mock_json_load.side_effect = ([['Albania', 77.8],
-                                       ['Bosnia and Herzegovina', 75.3]],
-                                      [['Albania', 64.4],
-                                       ['Bosnia and Herzegovina', 69.1]],
-                                      [["Albania", 50.2],
-                                       ["Bosnia and Herzegovina", 60.4]],
-                                      [["Albania", 80.9],
-                                       ["Bosnia and Herzegovina", 49.3]],
-                                      [["Albania", 62.1],
-                                       ["Bosnia and Herzegovina", 63.1]],
-                                      )
-        result = combine_cost_abroad.create_combined_file(food='A010101',
-                                                          alcohol='A010201',
-                                                          transport='A0107',
-                                                          recreation='A0109',
-                                                          restaurant_hotel='A0111')
-        self.assertEqual(result, {"food": [["Albania", 77.8],
-                                           ["Bosnia and Herzegovina", 75.3]],
-                                  "alcohol": [["Albania", 64.4],
-                                              ["Bosnia and Herzegovina", 69.1]],
-                                  "transport": [["Albania", 50.2],
-                                                ["Bosnia and Herzegovina", 60.4]],
-                                  "recreation": [["Albania", 80.9],
-                                                 ["Bosnia and Herzegovina", 49.3]],
-                                  "restaurant_hotel": [["Albania", 62.1],
-                                                       ["Bosnia and Herzegovina", 63.1]],
-                                  "overall": [("Albania", 67.1),
-                                              ("Bosnia and Herzegovina", 63.4)],
-                                  }
-                         )
+        mock_js.side_effect = self.cdata
+        result = cca.create_combined_file(food='A010101',
+                                          alcohol='A010201',
+                                          transport='A0107',
+                                          recreation='A0109',
+                                          restaurant_hotel='A0111')
+        self.assertEqual(result, self.combi)
 
 
     @patch('builtins.open',spec=True)
     def test_combined_write_called_correctly(self, mock_op, spec=True):
         """Combined write called with correct file name."""
-        combine_cost_abroad.combined_write({"food": [["Albania", 77.8],
-                                           ["Bosnia and Herzegovina", 75.3]],
-                                           "overall": [("Albania", 77.8),
-                                           ("Bosnia and Herzegovina", 75.3)]})
+        cca.combined_write({"food": [["Albania", 77.8],
+                                     ["Bosnia and Herzegovina", 75.3]],
+                            "overall": [("Albania", 77.8),
+                                        ("Bosnia and Herzegovina", 75.3)]})
         open.assert_called_with('combined.txt', 'w')
 
 
 class RunFilesTest(unittest.TestCase):
     """Test for the run_files module."""
+
     @patch('run_files.create_price_files', spec=True)
     @patch('run_files.create_combined_file', spec=True)
     def test_create_and_combined_called_correctly(self, mock_cf, mock_pf):
         """Test category file and combined file functions called correctly."""
         run_files.run_files(**run_files.categories)
-        run_files.create_price_files.assert_called_with(food='A010101',
-                                                        alcohol='A010201',
-                                                        transport='A0107',
-                                                        recreation='A0109',
-                                                        restaurant_hotel='A0111')
-        run_files.create_combined_file.assert_called_with(food='A010101',
-                                                          alcohol='A010201',
-                                                          transport='A0107',
-                                                          recreation='A0109',
-                                                          restaurant_hotel='A0111')
-
+        run_files.create_price_files.assert_called_with(
+                                                  food='A010101',
+                                                  alcohol='A010201',
+                                                  transport='A0107',
+                                                  recreation='A0109',
+                                                  restaurant_hotel='A0111')
+        run_files.create_combined_file.assert_called_with(
+                                                    food='A010101',
+                                                    alcohol='A010201',
+                                                    transport='A0107',
+                                                    recreation='A0109',
+                                                    restaurant_hotel='A0111')
 
 
 class VisualiseTest(DashSnapshotTestCase):
@@ -255,7 +234,7 @@ class VisualiseTest(DashSnapshotTestCase):
         """Test Dash app html snapshot matches reference snapshot."""
         my_component = visualise_cost_abroad.app.layout
         # Increment id to recreate snapshot when running test
-        self.assertSnapshotEqual(my_component, 'id-004')
+        self.assertSnapshotEqual(my_component, 'id-005')
 
 
     def test_choropleth_contains_country_list_excerpt(self):
