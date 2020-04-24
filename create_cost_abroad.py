@@ -18,7 +18,7 @@ import requests
 from filter_cost_abroad import filter_prices
 
 
-URL = 'http://ec.europa.eu/eurostat/wdds/rest/data/v2.1/json/en/prc_ppp_ind'
+URL = "http://ec.europa.eu/eurostat/wdds/rest/data/v2.1/json/en/prc_ppp_ind"
 
 
 def create_price_files(**kwargs):
@@ -36,30 +36,30 @@ def create_price_file(name, code):
 
 
 def write_prices(name, filtered_prices):
-    with open(f'{name}.txt', 'w') as outfile:
+    with open(f"{name}.txt", "w") as outfile:
         json.dump(filtered_prices, outfile)
-    # return filtered_prices
 
 
 def prices_raw(code):
     try:
-        response = requests.get(URL,
-            headers={'Accept': 'application/json'},
-            params={'na_item': 'PLI_EU28',
-                    'lastTimePeriod': '1',
-                    'precision': '1',
-                    'ppp_cat': code,
-                    }
-            )
-        if 'Dataset contains no data' in response.text:
-            print('invalid category reference number provided')
+        response = requests.get(
+            URL,
+            headers={"Accept": "application/json"},
+            params={
+                "na_item": "PLI_EU28",
+                "lastTimePeriod": "1",
+                "precision": "1",
+                "ppp_cat": code,
+            },
+        )
+        if "Dataset contains no data" in response.text:
+            print("invalid category reference number provided")
         elif not response.text:
-            print('there was a problem handling your request')
+            print("there was a problem handling your request")
         else:
             return response.json()
     except requests.ConnectionError:
-        print('failed to connect')
+        print("failed to connect")
     else:
         if not 200 <= response.status_code <= 299:
-            print(f'status code: {response.status_code} outside of 2xx range')
-
+            print(f"status code: {response.status_code} outside of 2xx range")

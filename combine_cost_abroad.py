@@ -25,17 +25,17 @@ def create_combined_file(**kwargs):
     """Combine category values into a single file with overall category."""
     cat_prices = {}
     for category in kwargs:
-        with open(f'{category}.txt') as json_file:
+        with open(f"{category}.txt") as json_file:
             prices = json.load(json_file)
         cat_prices[category] = prices
-    cat_prices['overall'] = _add_overall(cat_prices)
+    cat_prices["overall"] = _add_overall(cat_prices)
     combined_write(cat_prices)
     return cat_prices
 
 
 def combined_write(cat_prices):
     """Write combined values data to local file."""
-    with open('combined.txt', 'w') as outfile:
+    with open("combined.txt", "w") as outfile:
         json.dump(cat_prices, outfile)
 
 
@@ -45,5 +45,5 @@ def _add_overall(cat_prices):
     for item in cat_prices.values():
         for country, price in item:
             grouped[country].append(price)
-    average = {k:round(mean(v), 1) for k,v in grouped.items()}
+    average = {k: round(mean(v), 1) for k, v in grouped.items()}
     return list(average.items())
