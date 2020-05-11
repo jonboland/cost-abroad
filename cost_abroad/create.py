@@ -12,10 +12,11 @@ recreation='A0109'
 restaurant_hotel='A0111'
 """
 
-
 import json
 import requests
-from filter_cost_abroad import filter_prices
+from pathlib import Path
+
+from cost_abroad.filters import filter_prices
 
 
 URL = "http://ec.europa.eu/eurostat/wdds/rest/data/v2.1/json/en/prc_ppp_ind"
@@ -36,7 +37,8 @@ def create_price_file(name, code):
 
 
 def write_prices(name, filtered_prices):
-    with open(f"{name}.txt", "w") as outfile:
+    path = Path(f".\\data\\{name}.txt")
+    with open(path, mode="w") as outfile:
         json.dump(filtered_prices, outfile)
 
 
