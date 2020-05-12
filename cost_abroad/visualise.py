@@ -1,17 +1,20 @@
 import json
+from pathlib import Path
+
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
 
 
+# Load all cost category data
+path = Path(".\\data\\combined.txt")
+with open(path, mode="r") as json_file:
+    price_levels = json.load(json_file)
+
 external_stylesheets = ["https://codepen.io/jonboland/pen/yLyxpZa.css"]
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
-
-# Load all cost category data
-with open("combined.txt") as json_file:
-    price_levels = json.load(json_file)
 
 colours = ("reds", "magenta", "greens", "blues", "purples", "teal")
 categories = reversed(tuple(price_levels.keys()))

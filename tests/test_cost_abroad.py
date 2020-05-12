@@ -1,34 +1,36 @@
+from io import StringIO
 import unittest
 from unittest.mock import patch, call
-from io import StringIO
+
 import responses
+from pathlib import Path
 from snapshot_test import DashSnapshotTestCase
 
-import create_cost_abroad
-import filter_cost_abroad
-import combine_cost_abroad as cca
-import run_files
-import visualise_cost_abroad
+import cost_abroad.create
+import cost_abroad.filters
+import cost_abroad.combine
+import cost_abroad.run
+import cost_abroad.visualise
 
 
 URL = "http://ec.europa.eu/eurostat/wdds/rest/data/v2.1/json/en/prc_ppp_ind"
 
 
 class CreateTests(unittest.TestCase):
-    """Tests for the create_cost_abroad module."""
+    """Tests for the create module."""
 
-    @patch("create_cost_abroad.create_price_file", spec=True)
+    @patch("cost_abroad.create.create_price_file", spec=True)
     def test_create_price_files(self, mock_cpf):
         """Call create price file with two differnt categories."""
-        create_cost_abroad.create_price_files(alcohol="A010201", transport="A0107")
+        cost_abroad.create.create_price_files(alcohol="A010201", transport="A0107")
         self.assertEqual(
             mock_cpf.mock_calls,
             [call("alcohol", "A010201"), call("transport", "A0107")],
         )
 
-    @patch("create_cost_abroad.write_prices", spec=True)
+    @patch("cost_abroad.create.write_prices", spec=True)
     @patch(
-        "create_cost_abroad.prices_raw",
+        "cost_abroad.create.prices_raw",
         spec=True,
         return_value={
             "value": {"0": 77.8},
@@ -39,19 +41,20 @@ class CreateTests(unittest.TestCase):
     )
     def test_create_price_file(self, mock_pr, mock_wp):
         """Create price file returns list containing a tuple."""
-        result = create_cost_abroad.create_price_file("food", "A010101")
+        result = cost_abroad.create.create_price_file("food", "A010101")
         self.assertEqual(result, [("Albania", 77.8)])
 
     @patch("builtins.open")
     def test_write_prices_called_correctly(self, mock_op):
         """Write prices files called with correct category file name."""
-        create_cost_abroad.write_prices("recreation", [("Germany", 103.2)])
-        open.assert_called_with("recreation.txt", "w")
+        path = cost_abroad.create.Path(".\\data\\recreation.txt")
+        cost_abroad.create.write_prices("recreation", [("Germany", 103.2)])
+        open.assert_called_with(path, mode="w")
 
-    @patch("create_cost_abroad.requests.get", spec=True)
+    @patch("cost_abroad.create.requests.get", spec=True)
     def test_get_is_called_correctly(self, get_js):
         """Get is called with correct URL and parameters."""
-        create_cost_abroad.prices_raw("A0109")
+        cost_abroad.create.prices_raw("A0109")
         get_js.assert_called_with(
             URL,
             headers={"Accept": "application/json"},
@@ -63,11 +66,11 @@ class CreateTests(unittest.TestCase):
             },
         )
 
-    @patch("create_cost_abroad.requests.get")
+    @patch("cost_abroad.create.requests.get")
     def test_connection_error_suppressed(self, mock_get):
         """Default error text suppressed if connection error encountered."""
-        mock_get.side_effect = create_cost_abroad.requests.exceptions.ConnectionError()
-        self.assertIsNone(create_cost_abroad.prices_raw("A0111"))
+        mock_get.side_effect = cost_abroad.create.requests.exceptions.ConnectionError()
+        self.assertIsNone(cost_abroad.create.prices_raw("A0111"))
 
     @responses.activate
     def test_correct_message_printed_if_no_data_in_response(self):
@@ -76,7 +79,7 @@ class CreateTests(unittest.TestCase):
             responses.GET, URL, body='{"error": "Dataset contains no data"}', status=400
         )
         with patch("sys.stdout", new=StringIO()) as mock_out:
-            create_cost_abroad.prices_raw("invalidcodetest")
+            cost_abroad.create.prices_raw("invalidcodetest")
         self.assertIn("invalid category", mock_out.getvalue())
 
     @responses.activate
@@ -84,19 +87,19 @@ class CreateTests(unittest.TestCase):
         """Correct console message printed if server error returned."""
         responses.add(responses.GET, URL, status=500)
         with patch("sys.stdout", new=StringIO()) as mock_out:
-            create_cost_abroad.prices_raw("A010101")
+            cost_abroad.create.prices_raw("A010101")
         self.assertIn("500 outside", mock_out.getvalue())
 
     @responses.activate
     def test_json_returned_if_valid_code_provided(self):
         """JSON is returned if valid price category given as argument."""
         responses.add(responses.GET, URL, body=r'{"value": {"0": 77}}')
-        result = create_cost_abroad.prices_raw("A010201")
+        result = cost_abroad.create.prices_raw("A010201")
         self.assertEqual(result, {"value": {"0": 77}})
 
 
-class FilterTests(unittest.TestCase):
-    """Tests for the filter_cost_abroad module."""
+class FiltersTests(unittest.TestCase):
+    """Tests for the filters module."""
 
     def test_filter_no_tidy(self):
         """List of tuples containing name and value should be returned."""
@@ -119,7 +122,7 @@ class FilterTests(unittest.TestCase):
             },
         }
 
-        filtered = filter_cost_abroad.filter_prices(snip)
+        filtered = cost_abroad.filters.filter_prices(snip)
         self.assertEqual(
             filtered,
             [("Albania", 77.8), ("Austria", 126.6), ("Bosnia and Herzegovina", 75.3)],
@@ -143,7 +146,7 @@ class FilterTests(unittest.TestCase):
             },
         }
 
-        tdy_frg = filter_cost_abroad.filter_prices(snip)
+        tdy_frg = cost_abroad.filters.filter_prices(snip)
         self.assertEqual(
             tdy_frg, [("Albania", 77.8), ("Austria", 126.6), ("Germany", 102.4)]
         )
@@ -168,7 +171,7 @@ class FilterTests(unittest.TestCase):
             },
         }
 
-        tdy_can = filter_cost_abroad.filter_prices(snip)
+        tdy_can = cost_abroad.filters.filter_prices(snip)
         self.assertEqual(
             tdy_can,
             [("Albania", 77.8), ("Bosnia and Herzegovina", 75.3), ("Exclude", 74.4)],
@@ -201,7 +204,7 @@ class CombineTests(unittest.TestCase):
     def test_create_combined_file_one_cat(self, mock_op, mock_js):
         """Test one price categories combined with overall."""
         mock_js.side_effect = [self.cdata[0]]
-        result = cca.create_combined_file(food="A010101")
+        result = cost_abroad.combine.create_combined_file(food="A010101")
         self.assertEqual(
             result,
             {
@@ -215,7 +218,7 @@ class CombineTests(unittest.TestCase):
     def test_create_combined_file_two_cats(self, mock_op, mock_js):
         """Test two price categories combined with overall."""
         mock_js.side_effect = self.cdata[0:2]
-        result = cca.create_combined_file(food="A010101", alcohol="A010201")
+        result = cost_abroad.combine.create_combined_file(food="A010101", alcohol="A010201")
         self.assertEqual(
             result,
             {
@@ -229,7 +232,7 @@ class CombineTests(unittest.TestCase):
     def test_create_combined_file_all_cats(self, mock_op, mock_js):
         """Test all price categories combined with overall."""
         mock_js.side_effect = self.cdata
-        result = cca.create_combined_file(
+        result = cost_abroad.combine.create_combined_file(
             food="A010101",
             alcohol="A010201",
             transport="A0107",
@@ -241,31 +244,32 @@ class CombineTests(unittest.TestCase):
     @patch("builtins.open", spec=True)
     def test_combined_write_called_correctly(self, mock_op, spec=True):
         """Combined write called with correct file name."""
-        cca.combined_write(
+        path = cost_abroad.combine.Path(".\\data\\combined.txt")
+        cost_abroad.combine.combined_write(
             {
                 "food": [["Albania", 77.8], ["Bosnia and Herzegovina", 75.3]],
                 "overall": [("Albania", 77.8), ("Bosnia and Herzegovina", 75.3)],
             }
         )
-        open.assert_called_with("combined.txt", "w")
+        open.assert_called_with(path, mode="w")
 
 
-class RunFilesTest(unittest.TestCase):
+class RunTest(unittest.TestCase):
     """Test for the run_files module."""
 
-    @patch("run_files.create_price_files", spec=True)
-    @patch("run_files.create_combined_file", spec=True)
+    @patch("cost_abroad.run.create_price_files", spec=True)
+    @patch("cost_abroad.run.create_combined_file", spec=True)
     def test_create_and_combined_called_correctly(self, mock_cf, mock_pf):
         """Test category file and combined file functions called correctly."""
-        run_files.run_files(**run_files.categories)
-        run_files.create_price_files.assert_called_with(
+        cost_abroad.run.run(**cost_abroad.run.categories)
+        cost_abroad.run.create_price_files.assert_called_with(
             food="A010101",
             alcohol="A010201",
             transport="A0107",
             recreation="A0109",
             restaurant_hotel="A0111",
         )
-        run_files.create_combined_file.assert_called_with(
+        cost_abroad.run.create_combined_file.assert_called_with(
             food="A010101",
             alcohol="A010201",
             transport="A0107",
@@ -274,12 +278,12 @@ class RunFilesTest(unittest.TestCase):
         )
 
 
-class VisualiseTest(DashSnapshotTestCase):
-    """Test for the visualise_cost_abroad module."""
+class VisualiseTests(DashSnapshotTestCase):
+    """Test for the visualise module."""
 
     def test_html_snapshot_matches_reference(self):
         """Test Dash app html snapshot matches reference snapshot."""
-        my_component = visualise_cost_abroad.app.layout
+        my_component = cost_abroad.visualise.app.layout
         # Increment id to recreate snapshot when running test
         self.assertSnapshotEqual(my_component, "id-005")
 
@@ -295,9 +299,10 @@ class VisualiseTest(DashSnapshotTestCase):
             '"Slovakia", "Slovenia", "Spain", "Sweden", '
             '"Switzerland", "Turkey", "United Kingdom"'
         )
-        result = visualise_cost_abroad.update_figure("overall")
+        result = cost_abroad.visualise.update_figure("overall")
         self.assertIn(excerpt, result)
 
 
 if __name__ == "__main__":
     unittest.main()
+
