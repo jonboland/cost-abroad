@@ -25,9 +25,11 @@ complete = dict(zip(categories, colours))
 
 app.layout = html.Div(
     [
-        html.Div([html.H1("Cost Abroad")], style={"textAlign": "center"}),
         html.Div(
-            "Select a category and hover over countries "
+            [html.H1("Cost Abroad")], style={"textAlign": "center", "margin-top": 30}
+        ),
+        html.Div(
+            "Select a category then hover over countries "
             "to see how their prices compare to the EU average.",
             style={"textAlign": "center"},
         ),
