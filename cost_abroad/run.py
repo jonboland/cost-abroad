@@ -20,6 +20,6 @@ def run(**kwargs):
     create_price_files(**kwargs)
     create_combined_file(**kwargs)
 
-if __name__=='__main__':
-    run(**categories)
 
+if __name__ == '__main__':
+    run(**categories)

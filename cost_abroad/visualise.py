@@ -8,7 +8,7 @@ import plotly.graph_objs as go
 
 
 # Load all cost category data
-path = Path(".\\data\\combined.txt")
+path = Path(__file__).resolve().parent.parent / "data" / "combined.txt"
 with open(path, mode="r") as json_file:
     price_levels = json.load(json_file)
 
@@ -112,4 +112,4 @@ def update_figure(selected):
 
 
 if __name__ == "__main__":
-    app.run_server(debug=True)
+    app.run_server(debug=False)
