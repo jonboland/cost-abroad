@@ -70,7 +70,7 @@ class CombineTests(unittest.TestCase):
     @patch("builtins.open", spec=True)
     def test_combined_write_called_correctly(self, mock_op, spec=True):
         """Combined write called with correct file name."""
-        path = cost_abroad.combine.Path(".\\data\\combined.txt")
+        path = cost_abroad.combine.DATA_FOLDER / "combined.txt"
         cost_abroad.combine.combined_write(
             {
                 "food": [["Albania", 77.8], ["Bosnia and Herzegovina", 75.3]],
@@ -82,4 +82,3 @@ class CombineTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
