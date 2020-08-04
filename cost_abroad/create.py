@@ -37,7 +37,6 @@ def create_price_file(name, code):
 
 
 def write_prices(name, filtered_prices):
-    # path = Path(f".\\data\\{name}.txt")
     path = Path(__file__).resolve().parent.parent / "data" / f"{name}.txt"
     with open(path, mode="w") as outfile:
         json.dump(filtered_prices, outfile)

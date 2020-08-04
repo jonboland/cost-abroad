@@ -25,7 +25,6 @@ def create_combined_file(**kwargs):
     """Combine category values into a single file with overall category."""
     cat_prices = {}
     for category in kwargs:
-        # path = Path(f".\\data\\{category}.txt")
         path = Path(__file__).resolve().parent.parent / "data" / f"{category}.txt"
         with open(path, mode="r") as json_file:
             prices = json.load(json_file)
