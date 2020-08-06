@@ -21,11 +21,14 @@ from pathlib import Path
 from statistics import mean
 
 
+DATA_FOLDER = Path(__file__).resolve().parent.parent / "data"
+
+
 def create_combined_file(**kwargs):
     """Combine category values into a single file with overall category."""
     cat_prices = {}
     for category in kwargs:
-        path = Path(f".\\data\\{category}.txt")
+        path = DATA_FOLDER / f"{category}.txt"
         with open(path, mode="r") as json_file:
             prices = json.load(json_file)
         cat_prices[category] = prices
@@ -36,7 +39,7 @@ def create_combined_file(**kwargs):
 
 def combined_write(cat_prices):
     """Write combined values data to local file."""
-    path = Path(".\\data\\combined.txt")
+    path = DATA_FOLDER / "combined.txt"
     with open(path, mode="w") as outfile:
         json.dump(cat_prices, outfile)
 

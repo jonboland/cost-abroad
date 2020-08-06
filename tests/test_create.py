@@ -41,7 +41,7 @@ class CreateTests(unittest.TestCase):
     @patch("builtins.open")
     def test_write_prices_called_correctly(self, mock_op):
         """Write prices files called with correct category file name."""
-        path = cost_abroad.create.Path(".\\data\\recreation.txt")
+        path = cost_abroad.create.Path(__file__).resolve().parent.parent / "data" / "recreation.txt"
         cost_abroad.create.write_prices("recreation", [("Germany", 103.2)])
         open.assert_called_with(path, mode="w")
 
@@ -94,4 +94,3 @@ class CreateTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
