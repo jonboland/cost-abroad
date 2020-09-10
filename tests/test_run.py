@@ -11,7 +11,7 @@ class RunTest(unittest.TestCase):
     @patch("cost_abroad.run.create_combined_file", spec=True)
     def test_create_and_combined_called_correctly(self, mock_cf, mock_pf):
         """Test category file and combined file functions called correctly."""
-        cost_abroad.run.run(**cost_abroad.run.categories)
+        cost_abroad.run.main()
         cost_abroad.run.create_price_files.assert_called_with(
             food="A010101",
             alcohol="A010201",
