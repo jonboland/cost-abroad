@@ -7,7 +7,7 @@ from cost_abroad.create import create_price_files
 from cost_abroad.combine import create_combined_file
 
 
-categories = {
+CATEGORIES = {
     "restaurant_hotel": "A0111",
     "recreation": "A0109",
     "transport": "A0107",
@@ -16,10 +16,10 @@ categories = {
 }
 
 
-def run(**kwargs):
-    create_price_files(**kwargs)
-    create_combined_file(**kwargs)
+def main():
+    create_price_files(**CATEGORIES)
+    create_combined_file(**CATEGORIES)
 
 
 if __name__ == '__main__':
-    run(**categories)
+    main()
