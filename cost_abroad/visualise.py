@@ -8,13 +8,11 @@ import plotly.graph_objs as go
 
 
 # Load all cost category data
-path = Path(__file__).resolve().parent.parent / "data" / "combined.txt"
+path = Path(__file__).parent.parent / "data" / "combined.txt"
 with open(path, mode="r") as json_file:
     price_levels = json.load(json_file)
 
-external_stylesheets = ["https://codepen.io/jonboland/pen/yLyxpZa.css"]
-
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+app = dash.Dash(__name__)
 
 colours = ("reds", "magenta", "greens", "blues", "purples", "teal")
 categories = reversed(tuple(price_levels.keys()))
