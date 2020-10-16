@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 import dash
+import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
@@ -12,7 +13,7 @@ path = Path(__file__).parent.parent / "data" / "combined.txt"
 with open(path, mode="r") as json_file:
     price_levels = json.load(json_file)
 
-app = dash.Dash(__name__)
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 colours = ("reds", "magenta", "greens", "blues", "purples", "teal")
 categories = reversed(tuple(price_levels.keys()))
@@ -24,7 +25,7 @@ complete = dict(zip(categories, colours))
 app.layout = html.Div(
     [
         html.Div(
-            [html.H1("Cost Abroad")], style={"textAlign": "center", "margin-top": 30}
+            [html.H1("Cost Abroad")], style={"textAlign": "center", "margin-top": 20}
         ),
         html.Div(
             "Select a category then hover over countries "
@@ -50,8 +51,13 @@ app.layout = html.Div(
                             }
                             for x in complete
                         ],
-                        labelStyle={"display": "inline-block"},
-                        style={"textAlign": "center", "width": "auto"},
+                        labelStyle={"display": "inline-block", "margin-bottom": "0px"},
+                        inputStyle={"margin-left": "10px", "margin-right": "3px"},
+                        style={
+                            "textAlign": "center",
+                            "width": "auto",
+                            "margin-top": 10,
+                        },
                         className="six columns",
                     )
                 )
@@ -61,7 +67,12 @@ app.layout = html.Div(
         ),
         dcc.Graph(
             id="my-graph",
-            style={"width": 700, "margin-left": "auto", "margin-right": "auto"},
+            style={
+                "width": 650,
+                "margin-left": "auto",
+                "padding-left": 48,
+                "margin-right": "auto",
+            },
         ),
     ],
     className="container",
@@ -92,9 +103,9 @@ def update_figure(selected):
     return {
         "data": [trace],
         "layout": go.Layout(
-            height=700,
-            width=700,
-            font={"size": 16},
+            height=650,
+            width=650,
+            font={"size": 14},
             margin={"t": 0, "b": 0, "l": 0, "r": 0},
             geo={
                 "lataxis": {"range": [36.0, 71.0]},
@@ -110,4 +121,4 @@ def update_figure(selected):
 
 
 if __name__ == "__main__":
-    app.run_server(debug=False)
+    app.run_server(debug=True)
