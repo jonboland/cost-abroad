@@ -2,7 +2,8 @@ import unittest
 
 from snapshot_test import DashSnapshotTestCase
 
-import cost_abroad.visualise
+import context
+import visualise
 
 
 class VisualiseTests(DashSnapshotTestCase):
@@ -10,7 +11,7 @@ class VisualiseTests(DashSnapshotTestCase):
 
     def test_html_snapshot_matches_reference(self):
         """Test Dash app html snapshot matches reference snapshot."""
-        my_component = cost_abroad.visualise.app.layout
+        my_component = visualise.app.layout
         # Increment id to recreate snapshot when running test
         self.assertSnapshotEqual(my_component, "id-006")
 
@@ -26,7 +27,7 @@ class VisualiseTests(DashSnapshotTestCase):
             '"Slovakia", "Slovenia", "Spain", "Sweden", '
             '"Switzerland", "Turkey", "United Kingdom"'
         )
-        result = cost_abroad.visualise.update_figure("overall")
+        result = visualise.update_figure("overall")
         self.assertIn(excerpt, result)
 
 

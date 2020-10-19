@@ -1,6 +1,7 @@
 import unittest
 
-import cost_abroad.filters
+import context
+import filters
 
 
 class FiltersTests(unittest.TestCase):
@@ -27,7 +28,7 @@ class FiltersTests(unittest.TestCase):
             },
         }
 
-        filtered = cost_abroad.filters.filter_prices(snip)
+        filtered = filters.filter_prices(snip)
         self.assertEqual(
             filtered,
             [("Albania", 77.8), ("Austria", 126.6), ("Bosnia and Herzegovina", 75.3)],
@@ -51,7 +52,7 @@ class FiltersTests(unittest.TestCase):
             },
         }
 
-        tdy_frg = cost_abroad.filters.filter_prices(snip)
+        tdy_frg = filters.filter_prices(snip)
         self.assertEqual(
             tdy_frg, [("Albania", 77.8), ("Austria", 126.6), ("Germany", 102.4)]
         )
@@ -76,7 +77,7 @@ class FiltersTests(unittest.TestCase):
             },
         }
 
-        tdy_can = cost_abroad.filters.filter_prices(snip)
+        tdy_can = filters.filter_prices(snip)
         self.assertEqual(
             tdy_can,
             [("Albania", 77.8), ("Bosnia and Herzegovina", 75.3), ("Exclude", 74.4)],
