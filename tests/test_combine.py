@@ -1,7 +1,8 @@
 import unittest
 from unittest.mock import patch
 
-import cost_abroad.combine
+import context
+import combine
 
 
 class CombineTests(unittest.TestCase):
@@ -30,7 +31,7 @@ class CombineTests(unittest.TestCase):
     def test_create_combined_file_one_cat(self, mock_op, mock_js):
         """Test one price categories combined with overall."""
         mock_js.side_effect = [self.cdata[0]]
-        result = cost_abroad.combine.create_combined_file(food="A010101")
+        result = combine.create_combined_file(food="A010101")
         self.assertEqual(
             result,
             {
@@ -44,7 +45,7 @@ class CombineTests(unittest.TestCase):
     def test_create_combined_file_two_cats(self, mock_op, mock_js):
         """Test two price categories combined with overall."""
         mock_js.side_effect = self.cdata[0:2]
-        result = cost_abroad.combine.create_combined_file(food="A010101", alcohol="A010201")
+        result = combine.create_combined_file(food="A010101", alcohol="A010201")
         self.assertEqual(
             result,
             {
@@ -58,7 +59,7 @@ class CombineTests(unittest.TestCase):
     def test_create_combined_file_all_cats(self, mock_op, mock_js):
         """Test all price categories combined with overall."""
         mock_js.side_effect = self.cdata
-        result = cost_abroad.combine.create_combined_file(
+        result = combine.create_combined_file(
             food="A010101",
             alcohol="A010201",
             transport="A0107",
@@ -70,8 +71,8 @@ class CombineTests(unittest.TestCase):
     @patch("builtins.open", spec=True)
     def test_combined_write_called_correctly(self, mock_op, spec=True):
         """Combined write called with correct file name."""
-        path = cost_abroad.combine.DATA_FOLDER / "combined.txt"
-        cost_abroad.combine.combined_write(
+        path = combine.DATA_FOLDER / "combined.txt"
+        combine.combined_write(
             {
                 "food": [["Albania", 77.8], ["Bosnia and Herzegovina", 75.3]],
                 "overall": [("Albania", 77.8), ("Bosnia and Herzegovina", 75.3)],
