@@ -8,6 +8,7 @@ authors = ["jonboland <jon.boland@gmail.com>"]
 python = "^3.8"
 dash = "1.9.1"
 requests = "2.23.0"
+dash-bootstrap-components = "^0.10.7"
 
 [tool.poetry.dev-dependencies]
 responses = "0.10.12"
