@@ -7,13 +7,13 @@ import visualise
 
 
 class VisualiseTests(DashSnapshotTestCase):
-    """Test for the visualise module."""
+    """Tests for the visualise module."""
 
     def test_html_snapshot_matches_reference(self):
         """Test Dash app html snapshot matches reference snapshot."""
         my_component = visualise.app.layout
         # Increment id to recreate snapshot when running test
-        self.assertSnapshotEqual(my_component, "id-006")
+        self.assertSnapshotEqual(my_component, "id-008")
 
     def test_choropleth_contains_country_list_excerpt(self):
         """Test update_figure passing country list entries to choropleth."""
@@ -33,4 +33,3 @@ class VisualiseTests(DashSnapshotTestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
