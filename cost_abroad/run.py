@@ -1,10 +1,10 @@
 """
-Trigger the creation of all individual CostAbroad price files
+Trigger the creation of all individual Cost Abroad price files
 and a combined file including an overall category.
 """
 
-from cost_abroad.create import create_price_files
-from cost_abroad.combine import create_combined_file
+from create import create_price_files
+from combine import create_combined_file
 
 
 CATEGORIES = {

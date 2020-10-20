@@ -16,20 +16,20 @@ import json
 import requests
 from pathlib import Path
 
-from cost_abroad.filters import filter_prices
+from filters import filter_prices
 
 
 URL = "http://ec.europa.eu/eurostat/wdds/rest/data/v2.1/json/en/prc_ppp_ind"
 
 
 def create_price_files(**kwargs):
-    """Create price level data files for each category."""
+    """Create price level data files for each cost category."""
     for name, code in kwargs.items():
         create_price_file(name, code)
 
 
 def create_price_file(name, code):
-    """Create price level data file for a category."""
+    """Create price level data file for a cost category."""
     prices = prices_raw(code)
     filtered_prices = filter_prices(prices)
     write_prices(name, filtered_prices)
@@ -37,12 +37,14 @@ def create_price_file(name, code):
 
 
 def write_prices(name, filtered_prices):
-    path = Path(__file__).resolve().parent.parent / "data" / f"{name}.txt"
+    """Write price level data for a cost category."""
+    path = Path(__file__).resolve().parents[1] / "data" / f"{name}.txt"
     with open(path, mode="w") as outfile:
         json.dump(filtered_prices, outfile)
 
 
 def prices_raw(code):
+    """Request price data for a cost category from eurostat."""
     try:
         response = requests.get(
             URL,

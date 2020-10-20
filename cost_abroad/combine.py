@@ -21,7 +21,7 @@ from pathlib import Path
 from statistics import mean
 
 
-DATA_FOLDER = Path(__file__).resolve().parent.parent / "data"
+DATA_FOLDER = Path(__file__).resolve().parents[1] / "data"
 
 
 def create_combined_file(**kwargs):
