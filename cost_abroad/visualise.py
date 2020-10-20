@@ -28,7 +28,7 @@ complete = dict(zip(categories, colours))
 ############################### PAGE COMPONENTS ################################
 
 
-title = html.Div(
+heading = html.Div(
     [html.H1("Cost Abroad")], style={"textAlign": "center", "margin-top": 20}
 )
 
@@ -250,9 +250,11 @@ copyright = html.P(
 
 ################################## PAGE LAYOUT #################################
 
+app.title = "Cost Abroad"
+
 app.layout = html.Div(
     [
-        title,
+        heading,
         intro_one,
         intro_two,
         category_selectors,
