@@ -102,14 +102,13 @@ about_text = [
         className="card-text",
     ),
     html.P(
-        "There are wide variations in the cost of food, accommodation and transport etc. "
-        "between European countries, so being able to get a simple overview of these "
-        "differences in map form can help with planning trips and budgeting when travelling "
-        "on holiday or business.",
+        "The cost of things like food, accommodation, and transport varies widely between "
+        "European countries. So getting a simple overview of these differences in map form "
+        "can help with planning trips and budgeting when travelling on holiday or business.",
         className="card-text",
     ),
     html.P(
-        "Data is drawn from eurostat's price level indices (PLIs), "
+        "Data is drawn from Eurostat's price level indices (PLIs), "
         "which are based on a country's purchasing power parity divided by "
         "its current nominal exchange rate. PLIs are not intended to rank countries strictly, "
         "but provide a good indication of the order of magnitude of the price level "
