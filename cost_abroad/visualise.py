@@ -199,7 +199,7 @@ issues_section = html.Div(
                 [
                     html.H4("Issues and Ideas", className="card-title"),
                     html.P(
-                        "Do you have an issue to raise or an ideas you would like to share?",
+                        "Do you have an issue to raise or an idea you would like to share?",
                         className="card-text",
                     ),
                     dbc.Button(
