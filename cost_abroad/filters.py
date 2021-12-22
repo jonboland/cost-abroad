@@ -13,9 +13,18 @@ def filter_prices(prices):
 
 
 def _tidy_countries(countries):
-    """Return updated country list."""
+    """
+    Return country list with some names tidied or excluded 
+    so names and values match up and display correctly on the choropleth.
+    """
     return [
+        # The name given to Germany needs to be shortened because it's much too long
         "Germany" if "FRG" in name
+        # The candidate country text includes the word Turkey,
+        # which would be picked up and displayed incorrectly on the map
+        else "Exclude" if "Candidate" in name
         else name for name in countries
+        # The EU 28 entry is missing from the values list,
+        # so it must be ignored to avoid a misalignment between names and values
         if "28" not in name
     ]
