@@ -14,7 +14,8 @@ def filter_prices(prices):
 
 def _tidy_countries(countries):
     """Return updated country list."""
-    tidy = ["Germany" if "FRG" in x else x for x in countries]
-    # Without this Turkey is listed as candidate
-    tidy = ["Exclude" if "Candidate" in x else x for x in tidy]
-    return tidy
+    return [
+        "Germany" if "FRG" in name
+        else name for name in countries
+        if "28" not in name
+    ]

@@ -20,6 +20,7 @@ from filters import filter_prices
 
 
 URL = "http://ec.europa.eu/eurostat/wdds/rest/data/v2.1/json/en/prc_ppp_ind"
+INDICATOR = "PLI_EU27_2020"
 
 
 def create_price_files(**kwargs):
@@ -50,7 +51,7 @@ def prices_raw(code):
             URL,
             headers={"Accept": "application/json"},
             params={
-                "na_item": "PLI_EU28",
+                "na_item": INDICATOR,
                 "lastTimePeriod": "1",
                 "precision": "1",
                 "ppp_cat": code,
