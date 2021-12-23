@@ -13,7 +13,7 @@ class VisualiseTests(DashSnapshotTestCase):
         """Test Dash app html snapshot matches reference snapshot."""
         my_component = visualise.app.layout
         # Increment id to recreate snapshot when running test
-        self.assertSnapshotEqual(my_component, "id-008")
+        self.assertSnapshotEqual(my_component, "id-009")
 
     def test_choropleth_contains_country_list_excerpt(self):
         """Test update_figure passing country list entries to choropleth."""

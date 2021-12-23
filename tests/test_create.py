@@ -54,7 +54,7 @@ class CreateTests(unittest.TestCase):
             URL,
             headers={"Accept": "application/json"},
             params={
-                "na_item": "PLI_EU28",
+                "na_item": "PLI_EU27_2020",
                 "lastTimePeriod": "1",
                 "precision": "1",
                 "ppp_cat": "A0109",
